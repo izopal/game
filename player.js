@@ -10,6 +10,7 @@ export default class Player {
     constructor(game){
         this.game              = game;
         // підключення зображення персонажа
+        // this.image  = document.getElementById('dogImage');
         this.image             = dogImage;
         // параметр всіx положень персонажа
         this.states            = [ 
@@ -55,7 +56,7 @@ export default class Player {
     
     
     update(input, deltaTime){
-        this.checkCollision()
+        
         this.currrenState.handleInput(input);                          //обновлюємо положення персонажа в заледності від обрали клавіші
 
         // горизонтальна швидкість
@@ -74,8 +75,8 @@ export default class Player {
 
         // вертикальна швидкість  
         this.y += this.speedY;                                                                                // оновлюємо положення персонажа зарахунок додавання до початкової координвти Y парамету швидкості який змінюються при натисканні клавіш вгору/вниз в state.js
-        if      (!this.onGround())                         this.speedY += this.weight;                                                 // якщо персонаж не на землі (в повіртрі) швидкість руху персонажа буде направлена до низу і залежитиме від параметру this.weight                 
-        else                                                 this.speedY = 0;                                                            // в іншому випадку (якщо персонаж на землі) швидкість руху 0                               
+        if      (!this.onGround())                           this.speedY += this.weight;                      // якщо персонаж не на землі (в повіртрі) швидкість руху персонажа буде направлена до низу і залежитиме від параметру this.weight                 
+        else                                                 this.speedY = 0;                                 // в іншому випадку (якщо персонаж на землі) швидкість руху 0                               
         //  умова не виходу персонажа за межі вертикальної площини екрану                                                    
         if      (this.y < 0)                               { this.y = 0;                                      // умова перевірки щоб персонаж не виходив за верх екрану
                                                              this.speedY = this.weight; }
@@ -89,61 +90,14 @@ export default class Player {
         } else {
             this.frameTimer += deltaTime;
         }
-    };
 
-    draw(ctx){
-        //умова показу (малює) перснонажа на полотні в залежності від параметрів
-        if (this.isFacingRight) {
-            this.debugDraw(ctx);
-            ctx.drawImage ( this.image, 
-                            // параметри кадру, який обераємо
-                            this.frameX * this.width, 
-                            this.frameY * this.height, 
-                            this.width, 
-                            this.height, 
-                            // параметри кадру, де буде розміщений і які розміри буде мати
-                            this.x,                                                                // відображаємо зображення в оригінальному вигляді                             
-                            this.y, 
-                            this.dogWidth, 
-                            this.dogHeight 
-                );
-        } else {
-            this.debugDraw(ctx);
-            ctx.save();
-            ctx.scale(-1, 1);
-            ctx.drawImage (
-                            this.image, 
-                            // параметри кадру, який обераємо
-                            this.frameX * this.width, 
-                            this.frameY * this.height, 
-                            this.width, 
-                            this.height,
-                            // параметри кадру, де буде розміщений і які розміри буде мати
-                            -this.x - this.dogWidth,          // відображаємо зображення в дезркальному вигляді по осі X
-                            this.y, 
-                            this.dogWidth, 
-                            this.dogHeight,
-            );
-            ctx.restore();
-        }
+        this.checkCollision()
     };
 
     // фyнкція перевірки стану персонажа, якщо переснож на землі присвоюює значення true, якщо персонаж в повітрі - false.
     onGround(){ 
         return this.y > this.game.height - this.game.groundMargin - this.dogHeight ;
     };
-    
-    // Функція для зміни положення персонажа (отримуємо нове значення підкласу в залежності від typesOfPosition і викликаємо новий підклас за допомогою this.currrenState.enter())
-    setState(typesOfPosition, movementBacground){
-    
-        this.currrenState      = this.states[typesOfPosition];     // отримуємо положення персонажа this.states в залежності від значення яке приходить з typesOfPosition
-        this.movementBacground = movementBacground;
-        this.game.speed        = this.game.maxSpeed * this.movementBacground;
-        this.currrenState.enter();                                 // виклаємо ф-цію enter() взалежності від положення this.states[]
-        // console.log( th is.currrenState);                             
-    };
-    
-    
 
     checkCollision(){
         // Параметри регулювання зони персонажа
@@ -160,59 +114,107 @@ export default class Player {
                                                             this.RectY; 
         this.currrenState.activPosition ===  'крутитися' ?  ( this.RectY = .4, this.drawCircle = false) : 
                                                             ( this.RectY,      this.drawCircle = true);
-        
-        this.x1 = this.x  + this.dogWidth  * .25;                          // лівий верхній кут персонажа координата X
-        this.y1 = this.y  + this.dogHeight * this.RectY;  // лівий верхній кут персонажа координата Y
-        this.x2 = this.x1 + this.dogWidth  * this.RectX                    // правий верхній кут персонажа координата X
-        this.y2 = this.y1 + this.dogHeight * (1 - this.RectY);                   // лівий нижній кут персонажа координата Y
-
+        // Параметри координат для квадрату (туловище собаки)
+        this.x1     = this.x  + this.dogWidth  * .25;           // лівий верхній кут персонажа координата X
+        this.y1     = this.y  + this.dogHeight * this.RectY ;   // лівий верхній кут персонажа координата Y
+        this.x2     = this.x1 + this.dogWidth  * this.RectX                   // правий верхній кут персонажа координата X
+        this.y2     = this.y1 + this.dogHeight * (1 - this.RectY);            // лівий нижній кут персонажа координата Y
+        // Параметри координат для кола  (голова собаки)
+        this.xr     = this.x1 + this.ArcRight;                                // координати центру кругу по осі X
+        this.yr     = this.y1 - this.ArcY;                                    // координати центру кругу по осі Y
+        this.radius = this.dogWidth * .2,                                     // радіус кругу
+     
         this.game.enemies.forEach(enemy => {
-            // умова зіткнення (а саме все що виконується даною умовою, зіткнення не відбулося в ішому випадку зікнення авдбулося)
-            if ( enemy.x + enemy.width  > this.x1  && 
-                 enemy.x                < this.x2  && 
-                 enemy.y + enemy.height > this.y1  &&
-                 enemy.y                < this.y2 
-            ){
-                 enemy.markedForDelet = true;                               // позначаємо маркером на видалення
-                 this.game.score ++;                                        // збільшуємо лічильник на 1 якщо умова не відбулася 
-                }else{
+            // умова зіткнення (а саме все що виконується даною умовою, зіткнення не відбулося в ішому випадку зікнення відбулося)
+            if ( this.drawCircle                                     &&
+                 this.xr - enemy.x - enemy.enemyWidth  < this.radius && 
+                 enemy.x - this.xr                     < this.radius && 
+                 this.yr - enemy.y - enemy.enemyHeight < this.radius &&
+                 enemy.y - this.yr                     < this.radius )
+                 {enemy.markedForDelet = true;                              // позначаємо маркером на видалення
+                 this.game.score ++;}                                       // збільшуємо лічильник на 1 якщо умова не відбулася 
 
-            }
+            if ( enemy.x + enemy.enemyWidth  > this.x1 && 
+                 enemy.x                     < this.x2 && 
+                 enemy.y + enemy.enemyHeight > this.y1 &&
+                 enemy.y                     < this.y2 )
+                 {enemy.markedForDelet = true;                               // позначаємо маркером на видалення
+                  this.game.score ++;}                                       // збільшуємо лічильник на 1 якщо умова не відбулася 
         });
-    }
+    } 
+
     debugDraw(ctx){
         if(!this.game.debug) {
             // малюємо квадрат
             ctx.strokeStyle = 'blue';
-            ctx.strokeRect (
-                            this.x,  
+            ctx.strokeRect (this.x,  
                             this.y, 
                             this.dogWidth, 
-                            this.dogHeight, 
-                            ); 
-            ;
+                            this.dogHeight); 
+
             // малюємо квадрат
             ctx.strokeStyle = 'red';
-            ctx.strokeRect (
-                            this.x1,  
+            ctx.strokeRect (this.x1,  
                             this.y1, 
                             this.dogWidth  * this.RectX, 
-                            this.dogHeight * (1 - this.RectY), 
-                            ); 
+                            this.dogHeight * (1 - this.RectY)); 
                             
             // малюємо коло
             if (this.drawCircle){
-                ctx.beginPath();
                 ctx.strokeStyle = 'red';
-                ctx.arc        (        
-                                this.x1 + this.ArcRight, 
-                                this.y1 - this.ArcY,
-                                this.dogWidth * .2, 
-                                0,
-                                Math.PI * 2
-                                ); 
-                ctx.stroke();    
+                ctx.beginPath();
+                ctx.arc      (this.xr,         
+                              this.yr,                
+                              this.radius,               
+                              0,                                // початковий кут, в радіанах, з якого починається малюватися дуга чи круг.
+                              Math.PI * 2);                    // кут, в радіанах, до якого малюється дуга чи круг.
+                ctx.stroke   ();    
             }
         } 
+    };
+    
+    draw(ctx){
+        //умова показу (малює) перснонажа на полотні в залежності від параметрів
+        if (this.isFacingRight) {
+            this.debugDraw(ctx);
+            ctx.drawImage (this.image, 
+                           // параметри кадру, який обераємо
+                           this.frameX * this.width, 
+                           this.frameY * this.height, 
+                           this.width, 
+                           this.height, 
+                           // параметри кадру, де буде розміщений і які розміри буде мати
+                           this.x,                                                                // відображаємо зображення в оригінальному вигляді                             
+                           this.y, 
+                           this.dogWidth, 
+                           this.dogHeight);
+        } else {
+            this.debugDraw(ctx);
+            ctx.save      ();
+            ctx.scale     (-1, 1);
+            ctx.drawImage (this.image, 
+                           // параметри кадру, який обераємо
+                           this.frameX * this.width, 
+                           this.frameY * this.height, 
+                           this.width, 
+                           this.height,
+                           // параметри кадру, де буде розміщений і які розміри буде мати
+                           -this.x - this.dogWidth,          // відображаємо зображення в дезркальному вигляді по осі X
+                           this.y, 
+                           this.dogWidth, 
+                           this.dogHeight);
+            ctx.restore    ();
+        }
+    };
+    
+
+      // Функція для зміни положення персонажа (отримуємо нове значення підкласу в залежності від typesOfPosition і викликаємо новий підклас за допомогою this.currrenState.enter())
+      setState(typesOfPosition, movementBacground){
+    
+        this.currrenState      = this.states[typesOfPosition];     // отримуємо положення персонажа this.states в залежності від значення яке приходить з typesOfPosition
+        this.movementBacground = movementBacground;
+        this.game.speed        = this.game.maxSpeed * this.movementBacground;
+        this.currrenState.enter();                                 // виклаємо ф-цію enter() взалежності від положення this.states[]
+        // console.log( th is.currrenState);                             
     };
 }

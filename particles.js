@@ -1,6 +1,6 @@
 class Particle {
     constructor(player) {
-        this.player      = player;
+        this.player      = player; 
         this.movement    = this.player.movementBacground;
         // console.log(this.input)
         // маркер позначення на видалення
@@ -54,55 +54,81 @@ export class Dust extends Particle {
                         this.y, 
                         this.size, 
                          0, 
-                        Math.PI * 2
-        );
+                        Math.PI * 2 );
         ctx.fill      ();
         ctx.restore   ();
     }
 }
 
 export class Splash extends Particle {
- 
-}
+    constructor(player, x, y) {
+        super(player);
+        // підключення текстуру зіткнення
+        // this.image  = document.getElementById('boom');
+        this.image     = boom;
+        // параметри початкового розміщення на полотні
+        this.x         = x;                                 // лівий верхній кут персонажа координата X
+        this.y         = y;                                 // лівий нижній кут персонажа координата Y
+        // параметр випадкового розміру чатинок
+        this.size      = Math.random() * 100 + 100;
+        // параметри швидкості руху частинок
+        this.speedX    = Math.random() * 6 - 3;             // початкова горизонтальна швидкість
+        this.speedY    = Math.random() * 2 + 2;             // початкова вертикальна швидкість
+        this.gravity   = 0;
+    }
+    update(){
+        super.update();
+        this.gravity  += .1;
+        this.y        += this.gravity;
+    }
+    draw(ctx){
+        ctx.drawImage ( this.image, 
+                        this.x,                             
+                        this.y,                             
+                        this.size, 
+                        this.size ) 
+    }
+
+} 
 
 export class Fire extends Particle {
     constructor(player){
         super(player);
         // підключення текстуру зіткнення
+        // this.image  = document.getElementById('fire');
         this.image     = fire;
         // параметри початкового розміщення на полотні
-        this.x         = this.player.x + this.player.dogWidth  * .5;    // лівий верхній кут персонажа координата X
-        this.y         = this.player.y + this.player.dogHeight * .6;    // лівий нижній кут персонажа координата Y
+        this.x         = this.player.x + this.player.dogWidth  * .5;  // лівий верхній кут персонажа координата X
+        this.y         = this.player.y + this.player.dogHeight * .6;  // лівий нижній кут персонажа координата Y
         // параметр випадкового розміру чатинок
         this.size      = Math.random() * 100 + 50;
         // параметри швидкості руху частинок
-        this.speedX    = 2;                                               // початкова горизонтальна швидкість
-        this.speedY    = .25;                                              // початкова вертикальна швидкість
+        this.speedX    = 2;                                           // початкова горизонтальна швидкість
+        this.speedY    = .25;                                         // початкова вертикальна швидкість
         // параметри амплітудного (коливального) руху
         this.angle     = 0;
         this.va        = Math.random() * .2 - .1;  
     }
     update(){
         super.update();
-        this.angle    += this.va;                                         // обновлюємо з кожним новим фреймом
+        this.angle    += this.va;                                    // обновлюємо з кожним новим фреймом
         // Міняємо напрямок руху частинок горизонтальинй момент
-        this.player.isFacingRight ? this.x -= this.speedX:                // зправа наліво 
-                                    this.x += this.speedX;                // зліва направо 
+        this.player.isFacingRight ? this.x -= this.speedX:           // зправа наліво 
+                                    this.x += this.speedX;           // зліва направо 
         this.x        += Math.cos(this.angle * 5);
         // Вертикальний момент руху частинок
-        this.y        -= this.speedY;                                       // при русі частинки  піднімають догори
+        this.y        -= this.speedY;                                // при русі частинки  піднімають догори
     }
     draw(ctx) {
         ctx.save      ();
-        ctx.translate (this.x, this.y);                                    // ф-ція translate переміщаємо зображення(лівий верхній кут) частинки з положення (0,0) на полотні в центр персонажа 
-        ctx.rotate    (this.angle);                                        // ф-ція rotate повертає зображення за/проти годинникової стрілки в залежності від знаку (angle)
+        ctx.translate (this.x, this.y);                              // ф-ція translate переміщаємо зображення(лівий верхній кут) частинки з положення (0,0) на полотні в центр персонажа 
+        ctx.rotate    (this.angle);                                  // ф-ція rotate повертає зображення за/проти годинникової стрілки в залежності від знаку (angle)
         // малюємо наша зображення
         ctx.drawImage (  this.image, 
-                        -this.size * .5,                                   // зміщаємо вліво центр зображення частинки 
-                        -this.size * .5,                                   // піднімаємо  центр зображення частинки 
+                        -this.size * .5,                             // зміщаємо вліво центр зображення частинки 
+                        -this.size * .5,                             // піднімаємо  центр зображення частинки 
                          this.size, 
-                         this.size, 
-        );
+                         this.size );
         ctx.restore   ();
     } 
 }

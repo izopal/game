@@ -15,7 +15,6 @@ window.addEventListener('load', function(){
     canvasVS.width = window.screen.width;
     canvasVS.height = 500; //window.screen.height;
     
-
     class Game {
         constructor(width, height){
             //    
@@ -88,8 +87,8 @@ window.addEventListener('load', function(){
         if(this.player.movementBacground === 1){
             const randomEnemy = this.enemyTypes[Math.floor(Math.random() * this.enemyTypes.length)];    // параметри випадкової генерації числа від 0 до довжини масива this.enemyTypes[]
             // додаємо наших NPS в масив this.enemies яку створили вище
-            if      (randomEnemy == 'spider' ) this.enemies.push(new GroundEnemy   (this));
-            else if (randomEnemy == 'plant')   this.enemies.push(new ClimbingEnemy (this));
+            if      (randomEnemy == 'plant' ) this.enemies.push(new GroundEnemy   (this));
+            else if (randomEnemy == 'spider') this.enemies.push(new ClimbingEnemy (this));
         }   
         this.enemies.push(new FlyingEnemy(this));                                                       // додаємо всі згнеровані enemy_fly
         // console.log(this.enemies);

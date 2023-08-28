@@ -1,5 +1,6 @@
 import {
             Dust,
+            Splash,
             Fire,
         } from './particles.js';
 
@@ -57,7 +58,7 @@ export class Jumping extends Position {
         this.player = player;                                                                          
     }
     enter(){
-        this.player.frameY    = 1;   
+        this.player.frameY    = 1;    
         this.player.frameX    = 0;
         this.player.maxframeX = 6;
         if  ( this.player.onGround() )      this.player.speedY = -this.player.maxSpeedY;                            // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
@@ -122,46 +123,9 @@ export class Rolling extends Position {
     }
     handleInput(input){
         this.player.game.particles.unshift(new Fire(this.player));
-        if      (!input.includes(' ') && !input.includes('swipeRolling') &&  this.player.onGround()) this.player.setState(typesOfPosition.RUNNING, movementBacground.GO);                       // якщо персонаж на землі і відпустил клавішу " "  ми повертаємо значення RUNNING
-        if      (!input.includes(' ') && !input.includes('swipeRolling') && !this.player.onGround()) this.player.setState(typesOfPosition.FALLING, movementBacground.NITRO);                       // якщо персонаж в повітрі і відпустил клавішу " "  ми повертаємо значення FALLING
-        else if ( input.includes(' ') && input.includes('ArrowUp') &&  this.player.onGround()) this.player.speedY -= this.player.maxSpeedY;
-      if ( input.includes('swipeRolling') && input.includes('swipeUp') &&  this.player.onGround()) this.player.speedY -= this.player.maxSpeedY;
-    
-        // if (!input.includes('swipeRolling') &&  this.player.onGround())                        this.player.setState(typesOfPosition.RUNNING, movementBacground.GO);                       // якщо персонаж на землі і відпустил клавішу " "  ми повертаємо значення RUNNING
-
-    
-        //    if        ( input.includes(' ')           && 
-    //                input.includes('ArrowRight')  && 
-    //                input.includes('ArrowUp')     && 
-    //                this.player.onGround()          ) 
-    //         this.player.speedY -=  this.player.maxSpeedY,
-    //         this.player.speedX  =  this.player.maxSpeedX;
-    //     else if  ( input.includes(' ')           && 
-    //                input.includes('ArrowUp')     && 
-    //                input.includes('ArrowLeft')   && 
-    //                this.player.onGround()          )
-    //         this.player.speedY -=  this.player.maxSpeedY,
-    //         this.player.speedX  = -this.player.maxSpeedX;
+        if      (!input.includes(' ') && !input.includes('swipeRolling') &&  this.player.onGround())      this.player.setState(typesOfPosition.RUNNING, movementBacground.GO);                       // якщо персонаж на землі і відпустил клавішу " "  ми повертаємо значення RUNNING
+        if      (!input.includes(' ') && !input.includes('swipeRolling') && !this.player.onGround())      this.player.setState(typesOfPosition.FALLING, movementBacground.NITRO);                       // якщо персонаж в повітрі і відпустил клавішу " "  ми повертаємо значення FALLING
+        else if ( input.includes(' ') && input.includes('ArrowUp') &&  this.player.onGround())            this.player.speedY -= this.player.maxSpeedY;
+        if      ( input.includes('swipeRolling') && input.includes('swipeUp') &&  this.player.onGround()) this.player.speedY -= this.player.maxSpeedY;
     }
 }
-// Створюємо підклас Diving до класу Position 
-// export class Diving extends Position {
-//     constructor(player){
-//         super('знепретомлення');                                                                            // активне положення персонажа
-//         this.player = player; 
-//         console.log(this.player)                                                                           
-//     }
-//     enter(){
-//         this.speedY = 0;
-//         this.player.frameY    = 6;
-//         this.player.frameX    = 0;
-//         this.player.maxframeX = 6;
-
-//     }
-//     handleInput(input){
-//         this.player.game.particles.unshift(new Fire(this.player));
-//         if      ( !input.includes(' ') &&  this.player.onGround() )                             this.player.setState(typesOfPosition.RUNNING, movementBacground.GO);                       // якщо персонаж на землі і відпустил клавішу " "  ми повертаємо значення RUNNING
-//         else if ( !input.includes(' ') && !this.player.onGround() )                             this.player.setState(typesOfPosition.FALLING, movementBacground.NITRO);                       // якщо персонаж в повітрі і відпустил клавішу " "  ми повертаємо значення FALLING
-//         else if (  input.includes(' ') && input.includes('ArrowUp') && this.player.onGround())  this.player.speedY -= this.player.maxSpeedY;
-//     }
-// } 

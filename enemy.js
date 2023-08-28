@@ -73,6 +73,7 @@ export class FlyingEnemy extends Enemy {
         super();
         this.game         = game;
         // підключення зображення NPS
+        // this.image  = document.getElementById('enemy_fly');
         this.image        = enemy_fly;
         // параметри початквого розміру кадру (frame) зображення для персонажа
         this.width        = 60; 
@@ -101,8 +102,8 @@ export class FlyingEnemy extends Enemy {
         super.update(deltaTime);
         //  обнововлюємо амплітуду горизонтального руху кожні deltaTime часу
         this.angle += this.va;
-        this.y += Math.sin(this.angle) * this.speedY;
-    }
+        this.y += Math.sin(this.angle) * this.speedY; 
+    }   
     draw(ctx){
         super.draw(ctx);
         super.debugDraw(ctx);
@@ -115,6 +116,7 @@ export class GroundEnemy extends Enemy {
         super();
         this.game         = game;
         // підключення зображення NPS
+        // this.image  = document.getElementById('enemy_plant');
         this.image        = enemy_plant;
         // параметри початквого розміру кадру (frame) зображення для персонажа
         this.width        = 60; 
@@ -147,13 +149,15 @@ export class ClimbingEnemy extends Enemy {
     constructor(game){
         super();
         this.game         = game;
-        // підключення зображення NPS
+        // підключення зображення NPS  
+        // this.image  = document.getElementById('enemy_spider_big');
         this.image        = enemy_spider_big;
         // параметри початквого розміру кадру (frame) зображення для персонажа
         this.width        = 120; 
         this.height       = 144;
         // параметри кінцевого розміру кадру (frame) зображення для персонажа
         this.size         = Math.random() * .5 + .5;
+        // this.size         = 1;
         this.enemyWidth   = this.width  * this.size;
         this.enemyHeight  = this.height * this.size;
         // параметри початкового розміщення NPS на полотні
