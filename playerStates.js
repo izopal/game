@@ -1,18 +1,19 @@
 import {
             Dust,
-            Splash,
+            // Splash,
             Fire,
         } from './particles.js';
 
 
 const typesOfPosition   = {
-                            RUNNING:  0,
-                            JUMPING:  1,
-                            FALLING:  2,
-                            SITTING:  3,
-                            ROLLING:  4,
-                            DIVING:   5,
-                            HIT:      6,
+                            STADING:  0,
+                            RUNNING:  1,
+                            JUMPING:  2,
+                            FALLING:  3,
+                            SITTING:  4,
+                            ROLLING:  5,
+                            FAINT:    6,
+                            BARK:     7,
                             };
                         
 const movementBacground = { 
@@ -33,6 +34,28 @@ class Position {
 }   
 
 // ========================================= Блок управління з правої сторони =====================================>
+// Створюємо підклас Standing до класу Position 
+export class Standing extends Position {
+    constructor(player){
+        super('стояти');                                                                            // активне положення персонажа
+        this.player = player; 
+    }
+    enter(){
+        this.player.frameY    = 0;
+        this.player.frameX    = 0;
+        this.player.maxframeX = 6;
+    }
+    handleInput(input){
+        if      (input.includes('ArrowLeft')  || 
+                 input.includes('swipeLeft')  ||
+                 input.includes('ArrowRight') || 
+                 input.includes('swipeRight'))                                   this.player.setState(typesOfPosition.RUNNING, movementBacground.GO)       // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
+        else if (input.includes('ArrowUp')    || input.includes('swipeUp'))      this.player.setState(typesOfPosition.JUMPING, movementBacground.GO)       // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
+        else if (input.includes('ArrowDown')  || input.includes('swipeDown'))    this.player.setState(typesOfPosition.SITTING, movementBacground.STOP)     // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
+        else if (input.includes(' ')          || input.includes('swipeRolling')) this.player.setState(typesOfPosition.ROLLING, movementBacground.NITRO)   
+    }
+}
+
 // Створюємо підклас Running до класу Position 
 export class Running extends Position {
     constructor(player){
@@ -41,6 +64,7 @@ export class Running extends Position {
     }
     enter(){
         this.player.frameY    = 3;
+        this.player.frameX    = 0;
         this.player.maxframeX = 8;
     }
     handleInput(input){ 
@@ -64,7 +88,6 @@ export class Jumping extends Position {
         if  ( this.player.onGround() )      this.player.speedY = -this.player.maxSpeedY;                            // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
     }
     handleInput(input){
-        this.input = input;                                                                                         // присвоюємо значення const input = new InputHandler(); 
         if      ( this.player.speedY >= 0 ) this.player.setState(typesOfPosition.FALLING, movementBacground.GO) 
         else if ( input.includes(' ') )     this.player.setState(typesOfPosition.ROLLING, movementBacground.NITRO)  // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
     }
@@ -81,10 +104,9 @@ export class Falling extends Position {
         this.player.frameX    = 0;
         this.player.maxframeX = 6;
     }
-    handleInput(input){
-        this.input = input;                                                                         // присвоюємо значення const input = new InputHandler(); 
-        if ( this.player.onGround() ) this.player.setState(typesOfPosition.RUNNING, movementBacground.GO)                     
-    }
+    handleInput(){
+        if (this.player.onGround())    this.player.setState(typesOfPosition.RUNNING, movementBacground.GO);
+    }                    
 }
 
 // Створюємо підклас Sitting до класу Position 
@@ -102,9 +124,9 @@ export class Sitting extends Position {
         if      (input.includes('ArrowRight') || 
                  input.includes('swipeRight') || 
                  input.includes('swipeLeft')  || 
-                 input.includes('ArrowLeft'))                                this.player.setState(typesOfPosition.RUNNING, movementBacground.GO)       // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
-        else if (input.includes('ArrowUp')|| input.includes('swipeUp'))      this.player.setState(typesOfPosition.JUMPING, movementBacground.GO)       // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
-        else if (input.includes(' ')      || input.includes('swipeRolling')) this.player.setState(typesOfPosition.ROLLING, movementBacground.NITRO)   
+                 input.includes('ArrowLeft'))                                    this.player.setState(typesOfPosition.RUNNING, movementBacground.GO)       // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
+        else if (input.includes('ArrowUp')    || input.includes('swipeUp'))      this.player.setState(typesOfPosition.JUMPING, movementBacground.GO)       // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
+        else if (input.includes(' ')          || input.includes('swipeRolling')) this.player.setState(typesOfPosition.ROLLING, movementBacground.NITRO)   
     }  
 }
 
@@ -113,19 +135,39 @@ export class Rolling extends Position {
     constructor(player){
         super('крутитися');                                                                            // активне положення персонажа
         this.player = player; 
-        console.log(this.player)                                                                           
     }
     enter(){
-        this.speedY = 0;
+        // this.speedY = 0;
         this.player.frameY    = 6;
         this.player.frameX    = 0;
         this.player.maxframeX = 6;
     }
     handleInput(input){
-        this.player.game.particles.unshift(new Fire(this.player));
+        this.player.game.particles.unshift(new Fire(this.player)); 
         if      (!input.includes(' ') && !input.includes('swipeRolling') &&  this.player.onGround())      this.player.setState(typesOfPosition.RUNNING, movementBacground.GO);                       // якщо персонаж на землі і відпустил клавішу " "  ми повертаємо значення RUNNING
-        if      (!input.includes(' ') && !input.includes('swipeRolling') && !this.player.onGround())      this.player.setState(typesOfPosition.FALLING, movementBacground.NITRO);                       // якщо персонаж в повітрі і відпустил клавішу " "  ми повертаємо значення FALLING
-        else if ( input.includes(' ') && input.includes('ArrowUp') &&  this.player.onGround())            this.player.speedY -= this.player.maxSpeedY;
-        if      ( input.includes('swipeRolling') && input.includes('swipeUp') &&  this.player.onGround()) this.player.speedY -= this.player.maxSpeedY;
+        else if (!input.includes(' ') && !input.includes('swipeRolling') && !this.player.onGround())      this.player.setState(typesOfPosition.FALLING, movementBacground.NITRO);                       // якщо персонаж в повітрі і відпустил клавішу " "  ми повертаємо значення FALLING
+        else if ( input.includes(' ') &&  input.includes('ArrowUp')      &&  this.player.onGround())      this.player.speedY -= this.player.maxSpeedY;
+        if      ( input.includes('swipeRolling') && 
+                  input.includes('swipeUp')      &&  
+                  this.player.onGround())                                                                 this.player.speedY -= this.player.maxSpeedY;
     }
 }
+
+// Створюємо підклас Faint до класу Position 
+export class Faint extends Position {
+    constructor(player){
+        super('знепритомніти');                                                                            // активне положення персонажа
+        this.player = player; 
+    }
+    enter(){
+        // this.player.speedX    = 0;
+        this.player.frameY    = 4;
+        this.player.frameX    = 0;
+        this.player.maxframeX = 10;
+    }
+    handleInput(){
+       if      (this.player.frameX >= 10 &&  this.player.onGround()) this.player.setState(typesOfPosition.STADING, movementBacground.STOP)       // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
+       else if (this.player.frameX >= 10 && !this.player.onGround()) this.player.setState(typesOfPosition.FAINT,   movementBacground.STOP)       // ф-ція includes якщо значення відповідає вказаному в дужках повертає true в іншому випадку false 
+    }
+}
+

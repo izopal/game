@@ -35,7 +35,6 @@ export class Enemy {
              this.x                    >   this.multiplierEnemyArea * this.game.width && !this.game.player.isFacingRight
         )
              this.markedForDelet = true;
-        // console.log(this.markedForDelet);
     }
 
     draw(ctx){
@@ -112,13 +111,13 @@ export class FlyingEnemy extends Enemy {
 
 // Назмемні NPS
 export class GroundEnemy extends Enemy {
-    constructor(game){
+    constructor(game){ 
         super();
         this.game         = game;
         // підключення зображення NPS
         // this.image  = document.getElementById('enemy_plant');
         this.image        = enemy_plant;
-        // параметри початквого розміру кадру (frame) зображення для персонажа
+        // параметри початквого розміру кадру (frame) зображення для персонажа 
         this.width        = 60; 
         this.height       = 87;
         // параметри кінцевого розміру кадру (frame) зображення для персонажа

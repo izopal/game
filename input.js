@@ -3,8 +3,8 @@ export default class InputHandler {
         this.keys          = [];
         this.touchY        = '';
         this.touchX        = '';
-        this.touchTresholdX = 150; // відстань на яку треба свайпнути щоб виконувалися умови вліво-вправо
-        this.touchTresholdY = 50;  // відстань на яку треба свайпнути щоб виконувалися умови вгору-вниз
+        this.touchTresholdX = 150; // відстань на яку треба свайпнути щоб виконувалися умови вліво-вправо // ?????? проблема при адаптивеому розмірі не змінюється
+        this.touchTresholdY = 50;  // відстань на яку треба свайпнути щоб виконувалися умови вгору-вниз // ?????? проблема при адаптивеому розмірі не змінюється
         this.game = game;
 // ==========================Логіка керування за допомогою клавіатури=============================>
         // Додаємо до маиву this.keys інформацію яку натисненули клавішу (keydown' - натискання клавіші)
@@ -40,10 +40,11 @@ export default class InputHandler {
             if      ( this.touchY > this.game.height - this.game.groundMargin  && this.keys.indexOf('swipeDown') === -1)  this.keys.push('swipeDown');   // перевіряємо, чи проведено пальцем  вправо (swipeRight) на відстань, яка більша за this.touchTreshold (тобто фактично визначається рух вправо). 
             else if ( this.touchX > this.game.player.x + this.game.player.dogWidth * .5 && this.keys.indexOf('swipeRight') === -1) this.keys.push('swipeRight'); // перевіряємо, чи проведено пальцем  вправо (swipeRight) на відстань, яка більша за this.touchTreshold (тобто фактично визначається рух вправо). 
             else if ( this.touchX < this.game.player.x + this.game.player.dogWidth * .5 && this.keys.indexOf('swipeLeft') === -1)  this.keys.push('swipeLeft');   // перевіряємо, чи проведено пальцем  вправо (swipeRight) на відстань, яка більша за this.touchTreshold (тобто фактично визначається рух вправо). 
-        //   console.log(e.changedTouches[0]);
+        //   console.log(this.touchX, this.game.player.x);
+        //   console.log(this.touchY,  this.game.height - this.game.groundMargin);
         });
 
-        //  блок руху пальця на екрані.
+        //  блок руху пальця на екрані. 
         //  блок керування пальцем по горизонталі 
         window.addEventListener('touchmove', (e) => {
             const swipeDistanceX = e.changedTouches[0].pageX - this.touchX;             // параметр визначення на яку відстань змістився палець по горизонталі

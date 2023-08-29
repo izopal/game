@@ -14,6 +14,7 @@ window.addEventListener('load', function(){
     
     canvasVS.width = window.screen.width;
     canvasVS.height = 500; //window.screen.height;
+ 
     
     class Game {
         constructor(width, height){
@@ -29,6 +30,8 @@ window.addEventListener('load', function(){
             // інсталюємо  всі частинки в масив
             this.particles         = [];
             this.maxParticles      = 50;                     // регулюємо мкількість елементів в масиві this.particles 
+            // інсталюємо  всі елементи вибухів в масив
+            this.collisions        = [];
             // створюємо масив для регулювання випадкової появи NPS
             this.enemyTypes        = ['spider', 'plant'];
             // параметри частоти появи NPS
@@ -57,14 +60,12 @@ window.addEventListener('load', function(){
                 this.enemyTimer += deltaTime
             };
 
-            // перевіряємо на наявність елементів в масиві this.enemies = [] на наявність запускаємо елементів ф-ції update і  робимо перевірку чи є в даному масиві елемент позначений на видалення
-            this.enemies.forEach( (enemy) =>{
+            // опрацьовуємо різні типи NPS в масиві
+            this.enemies.forEach((enemy) =>{
                  enemy.update(deltaTime);
                  if (enemy.markedForDelet) this.enemies.splice(this.enemies.indexOf(enemy), 1);   // видаляємо повнісю елемент з масиву якщо виконується умова  markedForDelet = true;
             })
-            // console.log(this.enemies)  
-
-            // 
+            // опрацьовуємо різні типи частинок в масиві
             this.particles.forEach( (particle, index) => { 
                  particle.update(deltaTime);
                 if (particle.markedForDelet) this.particles.splice(index, 1);
@@ -72,26 +73,31 @@ window.addEventListener('load', function(){
             if (this.particles.length > this.maxParticles) {
                 this.particles = this.particles.slice(0, this.maxParticles);
             }
+            // опрацьовуємо вибухи під час зіткнення в масиві
+            this.collisions.forEach( (boom, index) => { 
+                boom.update(deltaTime);
+               if (boom.markedForDelet) this.collisions.splice(index, 1);
+           })
         } 
 
         draw(ctx){
             this.background.draw(ctx);
-            this.particles.forEach( particle => particle.draw(ctx) );
+            this.particles.forEach(particle => particle.draw(ctx));
+            this.collisions.forEach(boom => boom.draw(ctx));
             this.player.draw(ctx); 
-            this.enemies.forEach( enemy => enemy.draw(ctx) );
+            this.enemies.forEach(enemy => enemy.draw(ctx));
             this.statusText.draw(ctx);
         }
 
         // функція появи NPS на полотні (коил персонаж не рухається NPS не додаються)
         addEnemy(){
-        if(this.player.movementBacground === 1){
-            const randomEnemy = this.enemyTypes[Math.floor(Math.random() * this.enemyTypes.length)];    // параметри випадкової генерації числа від 0 до довжини масива this.enemyTypes[]
-            // додаємо наших NPS в масив this.enemies яку створили вище
-            if      (randomEnemy == 'plant' ) this.enemies.push(new GroundEnemy   (this));
-            else if (randomEnemy == 'spider') this.enemies.push(new ClimbingEnemy (this));
-        }   
-        this.enemies.push(new FlyingEnemy(this));                                                       // додаємо всі згнеровані enemy_fly
-        // console.log(this.enemies);
+            if(this.player.movementBacground === 1){
+                const randomEnemy = this.enemyTypes[Math.floor(Math.random() * this.enemyTypes.length)];    // параметри випадкової генерації числа від 0 до довжини масива this.enemyTypes[]
+                // додаємо наших NPS в масив this.enemies яку створили вище
+                if      (randomEnemy == 'plant' ) this.enemies.push(new GroundEnemy   (this));
+                else if (randomEnemy == 'spider') this.enemies.push(new ClimbingEnemy (this));
+            }   
+            this.enemies.push(new FlyingEnemy(this));                                                       // додаємо всі згнеровані enemy_fly
         }
     }
    

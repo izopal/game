@@ -1,15 +1,13 @@
 class Particle {
     constructor(player) {
-        this.player      = player; 
-        this.movement    = this.player.movementBacground;
-        // console.log(this.input)
-        // маркер позначення на видалення
-        this.markedForDelet = false;
+        this.player         = player; 
+        this.movement       = this.player.movementBacground;
+        this.markedForDelet = false;                                           // маркер позначення на видалення
     }
     update(){
-        this.size   *= .95;                                                              // при русі розмір частинки з кожним кадром зменшується на .95                                
+        this.size   *= .95;                                                    // при русі розмір частинки з кожним кадром зменшується на .95                                
         if (this.player.onGround() && this.size  < .5)
-        this.markedForDelet = true;                                                      // позначаємо всі частинки на видалення розмір яких зменшився до .5
+        this.markedForDelet = true;                                            // позначаємо всі частинки на видалення розмір яких зменшився до .5
         !this.player.onGround() ?  this.player.game.maxParticles = 10:                       
                                    this.player.game.maxParticles = 50;   
     }
@@ -60,36 +58,36 @@ export class Dust extends Particle {
     }
 }
 
-export class Splash extends Particle {
-    constructor(player, x, y) {
-        super(player);
-        // підключення текстуру зіткнення
-        // this.image  = document.getElementById('boom');
-        this.image     = boom;
-        // параметри початкового розміщення на полотні
-        this.x         = x;                                 // лівий верхній кут персонажа координата X
-        this.y         = y;                                 // лівий нижній кут персонажа координата Y
-        // параметр випадкового розміру чатинок
-        this.size      = Math.random() * 100 + 100;
-        // параметри швидкості руху частинок
-        this.speedX    = Math.random() * 6 - 3;             // початкова горизонтальна швидкість
-        this.speedY    = Math.random() * 2 + 2;             // початкова вертикальна швидкість
-        this.gravity   = 0;
-    }
-    update(){
-        super.update();
-        this.gravity  += .1;
-        this.y        += this.gravity;
-    }
-    draw(ctx){
-        ctx.drawImage ( this.image, 
-                        this.x,                             
-                        this.y,                             
-                        this.size, 
-                        this.size ) 
-    }
-
-} 
+// export class Splash extends Particle { 
+//     constructor(player) {
+//         super(player);
+//         // підключення текстуру зіткнення
+//         // this.image  = document.getElementById('fire');
+//         this.image     = fire;
+//         // параметр випадкового розміру чатинок
+//         this.size      = Math.random() * 100 + 100;
+//         // параметри початкового розміщення на полотні
+//         this.x         = this.player.x + this.player.dogWidth *.5    - this.size * .4;                                 // лівий верхній кут персонажа координата X
+//         this.y         = this.player.y + this.player.dogHeight - this.size * .5;                                 // лівий нижній кут персонажа координата Y
+//         // параметри швидкості руху частинок
+//         this.speedX    = Math.random() * 6 - 4;             // початкова горизонтальна швидкість
+//         this.speedY    = Math.random() * 2 + 1;             // початкова вертикальна швидкість
+//         this.gravity   = 0;
+//     }
+//     update(){
+//         super.update();
+//         this.gravity  += .1;
+//         this.x        -= this.speedX;
+//         this.y        += this.gravity;
+//     }
+//     draw(ctx){
+//         ctx.drawImage ( this.image, 
+//                         this.x,                             
+//                         this.y,                             
+//                         this.size, 
+//                         this.size ) 
+//     }
+// }   
 
 export class Fire extends Particle {
     constructor(player){

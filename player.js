@@ -1,29 +1,35 @@
 import { 
+            Standing,
             Running, 
             Jumping,
             Falling,
             Sitting,
             Rolling,
+            Faint,
         } from './playerStates.js';
+import CollisionAnimation from './collisionAnimation.js'
+
 
 export default class Player {
     constructor(game){
         this.game              = game;
         // підключення зображення персонажа
-        // this.image  = document.getElementById('dogImage');
+        // this.image  = document.getElementById('dogImage');  
         this.image             = dogImage;
         // параметр всіx положень персонажа
         this.states            = [ 
-                                    new Running (this),  
-                                    new Jumping (this),
-                                    new Falling (this),
-                                    new Sitting (this),
-                                    new Rolling (this),
+                                    new Standing (this),  
+                                    new Running  (this),  
+                                    new Jumping  (this),
+                                    new Falling  (this),
+                                    new Sitting  (this),
+                                    new Rolling  (this),
+                                    new Faint    (this),
                                 ]; 
         // параметри початкового положеня персонажа                          
-        this.currrenState      = this.states[3]; 
+        this.currrenState      = this.states[0]; 
         this.currrenState.enter();                       // викликаємо ф-цію enter() початкови кадр
-
+ 
         // параметри початквого розміру кадру (frame) зображення для персонажа
         this.width             = 100; 
         this.height            = 91.3;
@@ -40,20 +46,19 @@ export default class Player {
         this.maxframeX         = 5;
         this.frameY            = 0;  
         // параметри швидкості відображення кадрів
-        this.fps = 100;
+        this.fps               = 100;
         this.frameInterval     = 1000/this.fps;
         this.frameTimer        = 0;
         // параметри швидкості руху персонажа
-        this.speedX            = 0;                                   // початкова горизонтальна швидкість
-        this.maxSpeedX         = 10   * this.game.scale;              // максимальна горизонтальна швидкість
-        this.speedY            = 0;                                   // початкова вертикальна швидкість
-        this.maxSpeedY         = 30   * this.game.scale;              // максимальна вертикальна висота на яку пригає персонаж
-        this.weight            = 1.5  * this.game.scale;              // сила тяжіння/вага персонажа
+        this.speedX            = 0;                                  // початкова горизонтальна швидкість
+        this.maxSpeedX         = 10  * this.game.scale;              // максимальна горизонтальна швидкість
+        this.speedY            = 0;                                  // початкова вертикальна швидкість
+        this.maxSpeedY         = 30  * this.game.scale;              // максимальна вертикальна висота на яку пригає персонаж
+        this.weight            = 1.5 * this.game.scale;              // сила тяжіння/вага персонажа
         // параметри відзеркалення персонажа
         this.isFacingRight     = true; 
 
     };
-    
     
     update(input, deltaTime){
         
@@ -84,7 +89,7 @@ export default class Player {
         
         // відображення кадрів персонажа
         if (this.frameTimer > this.frameInterval) {
-            if (this.frameX < this.maxframeX) this.frameX ++;
+            if (this.frameX < this.maxframeX) this.frameX ++; 
             else                              this.frameX = 0;
             this.frameTimer = 0;
         } else {
@@ -126,20 +131,26 @@ export default class Player {
      
         this.game.enemies.forEach(enemy => {
             // умова зіткнення (а саме все що виконується даною умовою, зіткнення не відбулося в ішому випадку зікнення відбулося)
-            if ( this.drawCircle                                     &&
-                 this.xr - enemy.x - enemy.enemyWidth  < this.radius && 
-                 enemy.x - this.xr                     < this.radius && 
-                 this.yr - enemy.y - enemy.enemyHeight < this.radius &&
-                 enemy.y - this.yr                     < this.radius )
-                 {enemy.markedForDelet = true;                              // позначаємо маркером на видалення
-                 this.game.score ++;}                                       // збільшуємо лічильник на 1 якщо умова не відбулася 
+            if ( 
+                // умови зіткнення голови персонажа
+                this.drawCircle                                     &&
+                this.xr - enemy.x - enemy.enemyWidth  < this.radius && 
+                enemy.x - this.xr                     < this.radius && 
+                this.yr - enemy.y - enemy.enemyHeight < this.radius &&
+                enemy.y - this.yr                     < this.radius ||
+                // умови зіткнення туловища персонажа
+                enemy.x + enemy.enemyWidth            > this.x1     && 
+                enemy.x                               < this.x2     && 
+                enemy.y + enemy.enemyHeight           > this.y1     &&
+                enemy.y                               < this.y2){
 
-            if ( enemy.x + enemy.enemyWidth  > this.x1 && 
-                 enemy.x                     < this.x2 && 
-                 enemy.y + enemy.enemyHeight > this.y1 &&
-                 enemy.y                     < this.y2 )
-                 {enemy.markedForDelet = true;                               // позначаємо маркером на видалення
-                  this.game.score ++;}                                       // збільшуємо лічильник на 1 якщо умова не відбулася 
+                // параметри яуі повинні набутися після зіткненя персонажа з ворогом
+                enemy.markedForDelet  = true;                                    // позначаємо маркером на видалення
+                this.game.collisions.push(new CollisionAnimation(enemy, this));         // додаємо елемент вибуху
+                console.log(this);
+                if (this.currrenState === this.states[5]) this.game.score ++;    // збільшуємо лічильник на 1 якщо умова не відбулася
+                else this.setState(6, 0)                                         // переводимо в положення 'знепритомніти'
+            }
         });
     } 
 
@@ -207,9 +218,8 @@ export default class Player {
         }
     };
     
-
-      // Функція для зміни положення персонажа (отримуємо нове значення підкласу в залежності від typesOfPosition і викликаємо новий підклас за допомогою this.currrenState.enter())
-      setState(typesOfPosition, movementBacground){
+    // Функція для зміни положення персонажа (отримуємо нове значення підкласу в залежності від typesOfPosition і викликаємо новий підклас за допомогою this.currrenState.enter())
+    setState(typesOfPosition, movementBacground){
     
         this.currrenState      = this.states[typesOfPosition];     // отримуємо положення персонажа this.states в залежності від значення яке приходить з typesOfPosition
         this.movementBacground = movementBacground;
